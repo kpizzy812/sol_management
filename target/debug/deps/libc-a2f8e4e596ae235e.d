@@ -1,0 +1,12 @@
+/Users/a1/Projects/solana-asset-collector/asset-collector/target/debug/deps/liblibc-a2f8e4e596ae235e.rmeta: /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/lib.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/macros.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/primitives.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/mod.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/mod.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/apple/mod.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/apple/b64/mod.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/apple/b64/x86_64/mod.rs
+
+/Users/a1/Projects/solana-asset-collector/asset-collector/target/debug/deps/libc-a2f8e4e596ae235e.d: /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/lib.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/macros.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/primitives.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/mod.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/mod.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/apple/mod.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/apple/b64/mod.rs /Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/apple/b64/x86_64/mod.rs
+
+/Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/lib.rs:
+/Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/macros.rs:
+/Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/primitives.rs:
+/Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/mod.rs:
+/Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/mod.rs:
+/Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/apple/mod.rs:
+/Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/apple/b64/mod.rs:
+/Users/a1/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libc-0.2.174/src/unix/bsd/apple/b64/x86_64/mod.rs:
