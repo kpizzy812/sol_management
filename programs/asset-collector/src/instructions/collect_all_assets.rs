@@ -14,7 +14,7 @@ pub struct CollectAllAssets<'info> {
     #[account(mut)]
     pub user_wallet: Signer<'info>,
     
-    /// CHECK: Кошелек-получатель из настроек контракта
+    /// CHECK: Кошелек-получатель проверяется через constraint с collector_state.collector_wallet
     #[account(
         mut,
         constraint = collector_wallet.key() == collector_state.collector_wallet @ ErrorCode::InvalidCollectorWallet
