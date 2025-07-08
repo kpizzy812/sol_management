@@ -24,7 +24,7 @@ pub struct CollectAllAssets<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CollectAllAssets>) -> Result<()> {
+pub fn collect_all_assets_handler(ctx: Context<CollectAllAssets>) -> Result<()> {
     let collector_state = &ctx.accounts.collector_state;
     let user_wallet = &ctx.accounts.user_wallet;
     let collector_wallet = &ctx.accounts.collector_wallet;

