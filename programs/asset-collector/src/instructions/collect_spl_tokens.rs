@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 use anchor_spl::associated_token::AssociatedToken;
 use crate::state::*;
-use crate::error::ErrorCode;
 
 #[derive(Accounts)]
 pub struct CollectSplTokens<'info> {
@@ -17,7 +16,7 @@ pub struct CollectSplTokens<'info> {
     
     /// CHECK: Кошелек-получатель из настроек контракта
     #[account(
-        constraint = collector_wallet.key() == collector_state.collector_wallet @ ErrorCode::InvalidCollectorWallet
+        constraint = collector_wallet.key() == collector_state.collector_wallet
     )]
     pub collector_wallet: AccountInfo<'info>,
     
