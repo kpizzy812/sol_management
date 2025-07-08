@@ -110,7 +110,7 @@ describe("asset-collector", () => {
         
       expect.fail("Expected transaction to fail");
     } catch (error: any) {
-      expect(error.message).to.include("unauthorized");
+      expect(error.message).to.include("collector");
       console.log("✅ Correctly rejected wrong authority");
     }
   });

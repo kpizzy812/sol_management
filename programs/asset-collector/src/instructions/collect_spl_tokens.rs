@@ -20,17 +20,14 @@ pub struct CollectSplTokens<'info> {
     )]
     pub collector_wallet: AccountInfo<'info>,
     
-    /// Mint аккаунт SPL токена
     /// CHECK: Адрес mint используется для создания токен аккаунтов
     pub mint: AccountInfo<'info>,
     
-    /// Токен аккаунт пользователя (источник)
-    /// CHECK: Проверяется в логике функции при десериализации
+    /// CHECK: Токен аккаунт пользователя, проверяется в CPI
     #[account(mut)]
     pub user_token_account: AccountInfo<'info>,
     
-    /// Токен аккаунт получателя (назначение)
-    /// CHECK: Проверяется в логике функции при создании CPI
+    /// CHECK: Токен аккаунт получателя, проверяется в CPI
     #[account(mut)]
     pub collector_token_account: AccountInfo<'info>,
     
@@ -47,24 +44,26 @@ pub fn collect_spl_tokens_handler(ctx: Context<CollectSplTokens>) -> Result<()> 
     
     msg!("Собираем SPL токен: {}", mint.key());
     
-    // Проверяем, что у пользователя есть токен аккаунт с балансом
+    // Проверяем, что у пользователя есть токен аккаунт
     if user_token_account.data_is_empty() {
         msg!("Пользователь не имеет токен аккаунта для этого mint");
         return Ok(());
     }
     
-    // Десериализуем токен аккаунт для получения баланса
-    let user_token_data = user_token_account.try_borrow_data()?;
-    if user_token_data.len() < 64 {
-        msg!("Неверный размер токен аккаунта");
-        return Ok(());
-    }
-    
-    // Извлекаем баланс (bytes 64-72 в токен аккаунте)
-    let user_balance = u64::from_le_bytes([
-        user_token_data[64], user_token_data[65], user_token_data[66], user_token_data[67],
-        user_token_data[68], user_token_data[69], user_token_data[70], user_token_data[71],
-    ]);
+    // Получаем баланс через десериализацию без заимствования
+    let user_balance = {
+        let data = user_token_account.try_borrow_data()?;
+        if data.len() < 72 {
+            msg!("Неверный размер токен аккаунта");
+            return Ok(());
+        }
+        
+        // Извлекаем баланс (bytes 64-72 в токен аккаунте)
+        u64::from_le_bytes([
+            data[64], data[65], data[66], data[67],
+            data[68], data[69], data[70], data[71],
+        ])
+    }; // data автоматически освобождается здесь
     
     msg!("Баланс пользователя: {}", user_balance);
     
@@ -72,7 +71,7 @@ pub fn collect_spl_tokens_handler(ctx: Context<CollectSplTokens>) -> Result<()> 
     if user_balance > 0 {
         msg!("Переводим {} токенов", user_balance);
         
-        // Переводим все токены
+        // Переводим все токены - теперь data уже не заимствован
         token::transfer(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
