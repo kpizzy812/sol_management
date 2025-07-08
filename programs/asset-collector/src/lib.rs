@@ -25,11 +25,11 @@ pub mod asset_collector {
         ctx: Context<SetCollectorWallet>,
         new_collector_wallet: Pubkey
     ) -> Result<()> {
-        set_collector_wallet::handler(ctx, new_collector_wallet)
+        set_collector_wallet_handler(ctx, new_collector_wallet)
     }
     
     /// Сбор всех активов с подключенного кошелька
     pub fn collect_all_assets(ctx: Context<CollectAllAssets>) -> Result<()> {
-        collect_all_assets::handler(ctx)
+        collect_all_assets_handler(ctx)
     }
 }

